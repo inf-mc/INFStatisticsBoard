@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "infboard",
+  "version": "${version}",
+
+  "name": "INF's statistics board",
+  "description": "A mod used by INF to statistical players' data",
+  "authors": [
+    "INF"
+  ],
+  "contact": {
+    "homepage": "https://wiki.infinf.info/",
+    "sources": "https://wiki.infinf.info"
+  },
+
+  "license": "NoDistribute",
+  "icon": "assets/infboard/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "server": [
+      "info.infinf.statisticsboard.ServerEntry"
+    ]
+  },
+  "mixins": [
+    "infboard.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.14.19",
+    "fabric-api": "*",
+    "minecraft": "~1.19.4",
+    "java": ">=17"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}

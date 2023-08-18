@@ -7,6 +7,7 @@ import static java.lang.Math.max;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 
+import com.google.common.collect.Maps;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.registry.RegistryKey;
@@ -24,10 +25,9 @@ public class Areas {
 	private static final Logger LOGGER = LoggerFactory.getLogger("infboard");
 	private final File savePath;
 	private final HashMap<RegistryKey<World>, LinkedHashSet<BlockBox>> areas;
-
 	public Areas(File savePath) {
 		this.savePath = savePath;
-		areas = new HashMap<RegistryKey<World>, LinkedHashSet<BlockBox>>();
+		areas = Maps.newHashMap();
 	}
 
 	public Areas(File savePath, NbtCompound compound) {

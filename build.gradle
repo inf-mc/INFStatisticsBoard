@@ -13,21 +13,6 @@ repositories {
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
 
-	maven {
-		url 'https://jitpack.io'
-	}
-	maven {
-		url "https://maven.terraformersmc.com/"
-	}
-	maven {
-		url "https://maven.shedaniel.me/"
-	}
-	maven {
-		url "https://maven.siphalor.de/"
-	}
-	maven {
-		url "https://maven.isxander.dev/releases"
-	}
 }
 
 dependencies {
@@ -42,7 +27,6 @@ dependencies {
 
 	 // modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
 
-	modImplementation("com.github.Lortseam.completeconfig:base:2.3.1")
 }
 
 base {

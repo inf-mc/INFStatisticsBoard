@@ -18,6 +18,8 @@ public final class Config {
 
 	private static File confDir;
 	private static File confFile;
+	private static boolean fpPrefixFeature;
+	private static String fpPrefix;
 	private static boolean defaultMiningAreaType;
 	private static Areas miningAreaWhiteList;
 	private static Areas miningAreaBlackList;
@@ -27,7 +29,10 @@ public final class Config {
 		confDir.mkdirs();
 		confFile = new File(confDir, CONF_NAME);
 		var conf = loadNbt(confFile);
+		fpPrefixFeature = conf.getBoolean("fpPrefixFeature");
+		fpPrefix = conf.getString("fpPrefix");
 		defaultMiningAreaType = conf.getBoolean("defaultMiningAreaType");
+
 		var miningAreaBlackListFile = new File(confDir, "MiningAreaBlackList.nbt");
 		miningAreaBlackList = new Areas(miningAreaBlackListFile, loadNbt(miningAreaBlackListFile));
 		var miningAreaWhiteListFile = new File(confDir, "MiningAreaWhiteList.nbt");
@@ -51,6 +56,8 @@ public final class Config {
 
 	private static void save() {
 		var conf = new NbtCompound();
+		conf.putBoolean("fpPrefixFeature", fpPrefixFeature);
+		conf.putString("fpPrefix", fpPrefix);
 		conf.putBoolean("defaultMiningAreaType", defaultMiningAreaType);
 		try {
 			NbtIo.write(conf, confFile);
@@ -67,6 +74,24 @@ public final class Config {
 
 	public static void setDefaultMiningAreaType(boolean defaultMiningAreaType) {
 		Config.defaultMiningAreaType = defaultMiningAreaType;
+		save();
+	}
+
+	public static boolean getFpPrefixFeature() {
+		return fpPrefixFeature;
+	}
+
+	public static void setFpPrefixFeature(boolean fpPrefixFeature) {
+		Config.fpPrefixFeature = fpPrefixFeature;
+		save();
+	}
+
+	public static String getFpPrefix() {
+		return fpPrefix;
+	}
+
+	public static void setFpPrefix(String fpPrefix) {
+		Config.fpPrefix = fpPrefix;
 		save();
 	}
 

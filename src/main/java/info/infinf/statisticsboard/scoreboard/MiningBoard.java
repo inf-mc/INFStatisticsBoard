@@ -38,6 +38,11 @@ public final class MiningBoard {
 			BlockEntity be) {
 		// 防止发生错误，如果这里错误不捕获会导致挖掘不掉落方块
 		try {
+			var name = pl.getName().getString();
+			if (Config.getFpPrefixFeature() &&
+					name.startsWith(Config.getFpPrefix())) {
+				return;
+			}
 			if (Config.getDefaultMiningAreaType()) {
 				if (!Config.getMiningAreaWhiteList().contains(pos, world.getRegistryKey()) ||
 						Config.getMiningAreaBlackList().contains(pos, world.getRegistryKey())) {
@@ -50,7 +55,7 @@ public final class MiningBoard {
 				}
 			}
 			var sc = scoreboardObj.getScoreboard().
-				getPlayerScore(pl.getName().getString(), scoreboardObj);
+				getPlayerScore(name, scoreboardObj);
 			sc.setScore(sc.getScore() + 1);
 		} catch (Exception e) {
 			e.printStackTrace();

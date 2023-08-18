@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import info.infinf.statisticsboard.Config;
 import info.infinf.statisticsboard.command.Command;
+import info.infinf.statisticsboard.scoreboard.DeathBoard;
+import info.infinf.statisticsboard.scoreboard.KillBoard;
 import info.infinf.statisticsboard.scoreboard.MiningBoard;
 
 public final class ServerEntry implements DedicatedServerModInitializer {
@@ -26,6 +28,8 @@ public final class ServerEntry implements DedicatedServerModInitializer {
 
 	private void onServerStarted(MinecraftServer server) {
 		var scoreboard = server.getScoreboard();
+		// DeathBoard.init(scoreboard);
+		// KillBoard.init(scoreboard);
 		MiningBoard.init(scoreboard);
 	}
 }

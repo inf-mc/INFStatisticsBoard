@@ -10,10 +10,10 @@
   ],
   "contact": {
     "homepage": "https://wiki.infinf.info/",
-    "sources": "https://wiki.infinf.info"
+    "sources": "https://github.com/infinf-dev/INFStatisticsBoard"
   },
 
-  "license": "NoDistribute",
+  "license": "MIT",
   "icon": "assets/infboard/icon.png",
 
   "environment": "*",

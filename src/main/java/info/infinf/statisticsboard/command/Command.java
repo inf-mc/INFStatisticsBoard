@@ -2,18 +2,17 @@ package info.infinf.statisticsboard.command;
 
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
-import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.command.argument.BlockPosArgumentType;
-import static net.minecraft.command.argument.BlockPosArgumentType.getBlockPos;
 import net.minecraft.command.argument.DimensionArgumentType;
 import net.minecraft.command.argument.ScoreboardObjectiveArgumentType;
+import net.minecraft.command.argument.TextArgumentType;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.scoreboard.Scoreboard;
-import static net.minecraft.server.command.CommandManager.*;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -23,7 +22,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import info.infinf.statisticsboard.Areas;
+import info.infinf.statisticsboard.command.SwitchHandler;
 import info.infinf.statisticsboard.Config;
+
+import static net.minecraft.server.command.CommandManager.*;
+import static net.minecraft.command.argument.BlockPosArgumentType.getBlockPos;
 
 public final class Command {
 	private static final Logger LOGGER = LoggerFactory.getLogger("infboard");
@@ -34,25 +37,27 @@ public final class Command {
 			RegistrationEnvironment env) {
 		dispatcher.register(literal("infboard")
 			.then(literal("switch")
+				.executes(SwitchHandler::sendScoreboards)
 				.then(argument("boardname", ScoreboardObjectiveArgumentType.scoreboardObjective())
 					.executes(ctx -> {
-						try {
-							var sbo = ScoreboardObjectiveArgumentType.getObjective(ctx, "boardname");
-							sbo.getScoreboard().setObjectiveSlot(1, sbo);
-							return 1;
-						} catch (CommandSyntaxException e) {
-							ctx.getSource().sendFeedback(Text.of("找不到计分板"), false);
-							return -1;
-						}
-					}))
-			)
-			.then(literal("MiningAreaBlackList")
+						var sbo = ScoreboardObjectiveArgumentType.getObjective(ctx, "boardname");
+						sbo.getScoreboard().setObjectiveSlot(1, sbo);
+						return 1;
+					})))
+			.then(literal("setDisplayName")
 				.requires(src -> src.hasPermissionLevel(1))
+				.then(argument("boardname", ScoreboardObjectiveArgumentType.scoreboardObjective())
+					.then(argument("displayName", TextArgumentType.text())
+						.executes(ctx -> {
+							ScoreboardObjectiveArgumentType.getObjective(ctx, "boardname")
+								.setDisplayName(TextArgumentType.getTextArgument(ctx, "displayName"));
+							return 1;
+						}))))
+			.then(literal("miningAreaBlackList")
 				.then(addAreaHandler(Config.getMiningAreaBlackList()))
 				.then(removeAreaHandler(Config.getMiningAreaBlackList()))
 				.then(listAreaHandler(Config.getMiningAreaBlackList())))
-			.then(literal("MiningAreaWhiteList")
-				.requires(src -> src.hasPermissionLevel(1))
+			.then(literal("miningAreaWhiteList")
 				.then(addAreaHandler(Config.getMiningAreaWhiteList()))
 				.then(removeAreaHandler(Config.getMiningAreaWhiteList()))
 				.then(listAreaHandler(Config.getMiningAreaWhiteList())))
@@ -68,12 +73,35 @@ public final class Command {
 						Config.setDefaultMiningAreaType(BoolArgumentType.getBool(ctx, "isBlackList"));
 						return 1;
 					})))
+			.then(literal("fakePlayerPrefix")
+				.executes(ctx -> {
+					ctx.getSource().sendFeedback(Text.of(
+						Config.getFpPrefixFeature() ?
+						"假人前缀功能已开启，前缀为\"" + Config.getFpPrefix() + "\"" :
+						"假人前缀功能已关闭"), false);
+					return 1;
+				})
+				.then(literal("switch")
+					.requires(src -> src.hasPermissionLevel(1))
+					.then(argument("value", BoolArgumentType.bool())
+						.executes(ctx -> {
+							Config.setFpPrefixFeature(BoolArgumentType.getBool(ctx, "value"));
+							return 1;
+						})))
+				.then(literal("set")
+					.requires(src -> src.hasPermissionLevel(1))
+					.then(argument("prefix", StringArgumentType.word())
+						.executes(ctx -> {
+							Config.setFpPrefix(StringArgumentType.getString(ctx, "prefix"));
+							return 1;
+						}))))
 		);
 	}
 
 	private static LiteralArgumentBuilder<ServerCommandSource>
 			addAreaHandler(Areas area) {
 		return literal("add")
+			.requires(src -> src.hasPermissionLevel(1))
 			.then(argument("dimension", DimensionArgumentType.dimension())
 				.then(argument("from", BlockPosArgumentType.blockPos())
 					.then(argument("to", BlockPosArgumentType.blockPos())
@@ -93,6 +121,7 @@ public final class Command {
 	private static LiteralArgumentBuilder<ServerCommandSource>
 			removeAreaHandler(Areas area) {
 		return literal("remove")
+			.requires(src -> src.hasPermissionLevel(1))
 			.then(argument("dimension", DimensionArgumentType.dimension())
 				.then(argument("index", IntegerArgumentType.integer(1))
 						.executes(ctx -> {

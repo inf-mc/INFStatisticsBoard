@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.registry.RegistryKey;
@@ -20,11 +21,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import info.infinf.statisticsboard.utils.LinkedHashSets;
+import info.infinf.statisticsboard.utils.Nbts;
 
 public class Areas {
 	private static final Logger LOGGER = LoggerFactory.getLogger("infboard");
 	private final File savePath;
 	private final HashMap<RegistryKey<World>, LinkedHashSet<BlockBox>> areas;
+
 	public Areas(File savePath) {
 		this.savePath = savePath;
 		areas = Maps.newHashMap();
@@ -32,8 +35,8 @@ public class Areas {
 
 	public Areas(File savePath, NbtCompound compound) {
 		this.savePath = savePath;
-		areas = new HashMap<RegistryKey<World>, LinkedHashSet<BlockBox>>();
-		for (var world: compound.getKeys()) {
+		areas = Maps.newHashMap();
+		for (var world: compound.getKeys()) {;
 			if (!Identifier.isValid(world)) {
 				continue;
 			}
@@ -47,6 +50,10 @@ public class Areas {
 					max(arr[i], arr[i+3]), max(arr[i+1], arr[i+4]), max(arr[i+2], arr[i+5])));
 			}
 		}
+	}
+
+	public static Areas loadNbtFile(File f) {
+		return new Areas(f, Nbts.load(f));
 	}
 
 	public void save() {
@@ -89,7 +96,7 @@ public class Areas {
 	}
 
 	public boolean add(BlockBox box, RegistryKey<World> world) {
-		return areas.computeIfAbsent(world, w -> new LinkedHashSet<BlockBox>()).add(box);
+		return areas.computeIfAbsent(world, w -> Sets.newLinkedHashSet()).add(box);
 	}
 
 	public boolean remove(int index, RegistryKey<World> world) {

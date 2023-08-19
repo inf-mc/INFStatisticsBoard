@@ -18,7 +18,7 @@
 
   "environment": "*",
   "entrypoints": {
-    "server": [
+    "main": [
       "info.infinf.statisticsboard.ServerEntry"
     ]
   },

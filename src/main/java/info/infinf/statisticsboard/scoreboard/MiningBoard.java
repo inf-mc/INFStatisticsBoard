@@ -1,6 +1,5 @@
 package info.infinf.statisticsboard.scoreboard;
 
-import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -27,10 +26,9 @@ public final class MiningBoard {
 					Text.literal(DISPLAY_NAME),
 					ScoreboardCriterion.RenderType.INTEGER);
 		}
-		PlayerBlockBreakEvents.AFTER.register(MiningBoard::onBreakBlock);
 	}
 
-	private static void onBreakBlock(
+	public static void onBreakBlock(
 			World world,
 			PlayerEntity pl,
 			BlockPos pos,

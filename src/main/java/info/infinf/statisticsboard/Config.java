@@ -2,15 +2,18 @@ package info.infinf.statisticsboard;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtIntArray;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.WorldSavePath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import info.infinf.statisticsboard.Areas;
+import info.infinf.statisticsboard.utils.Nbts;
 
 public final class Config {
 	private static final Logger LOGGER = LoggerFactory.getLogger("infboard");
@@ -24,34 +27,30 @@ public final class Config {
 	private static Areas miningAreaWhiteList;
 	private static Areas miningAreaBlackList;
 
-	public static void init() {
-		confDir = new File(FabricLoader.getInstance().getConfigDir().toFile(), "infboard");
+	public static void init(MinecraftServer server) {
+		// need better alternatives
+		try {
+			Constructor newWorldSavePath = WorldSavePath.class
+				.getDeclaredConstructor(String.class);
+			newWorldSavePath.setAccessible(true);
+			confDir = server.getSavePath(
+				(WorldSavePath)newWorldSavePath.newInstance("infboard")).toFile();
+			newWorldSavePath.setAccessible(false);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		LOGGER.info(confDir.getAbsolutePath());
 		confDir.mkdirs();
 		confFile = new File(confDir, CONF_NAME);
-		var conf = loadNbt(confFile);
+		var conf = Nbts.load(confFile);
 		fpPrefixFeature = conf.getBoolean("fpPrefixFeature");
 		fpPrefix = conf.getString("fpPrefix");
 		defaultMiningAreaType = conf.getBoolean("defaultMiningAreaType");
 
-		var miningAreaBlackListFile = new File(confDir, "MiningAreaBlackList.nbt");
-		miningAreaBlackList = new Areas(miningAreaBlackListFile, loadNbt(miningAreaBlackListFile));
-		var miningAreaWhiteListFile = new File(confDir, "MiningAreaWhiteList.nbt");
-		miningAreaWhiteList = new Areas(miningAreaWhiteListFile, loadNbt(miningAreaWhiteListFile));
-	}
-
-	private static NbtCompound loadNbt(File f) {
-		try {
-			var conf = NbtIo.read(f);
-			if (conf == null) {
-				return new NbtCompound();
-			}
-			return conf;
-		} catch (IOException e) {
-			LOGGER.error(
-				String.format("An error occured when reading config file from %s", f));
-			e.printStackTrace();
-			return null;
-		}
+		miningAreaBlackList = Areas.loadNbtFile(
+			new File(confDir, "MiningAreaBlackList.nbt"));
+		miningAreaWhiteList = Areas.loadNbtFile(
+			new File(confDir, "MiningAreaWhiteList.nbt"));
 	}
 
 	private static void save() {

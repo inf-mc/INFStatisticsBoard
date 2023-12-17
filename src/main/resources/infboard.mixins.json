@@ -3,7 +3,9 @@
   "minVersion": "0.8",
   "package": "info.infinf.statisticsboard.mixins",
   "compatibilityLevel": "JAVA_17",
-  "mixins": [
+  "server": [
+    "ServerPlayerEntity_onDeath",
+    "BlockItem_place"
   ],
   "injectors": {
     "defaultRequire": 1

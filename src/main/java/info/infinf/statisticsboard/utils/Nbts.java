@@ -8,7 +8,7 @@ import net.minecraft.nbt.NbtIo;
 
 import info.infinf.statisticsboard.Areas;
 
-public class Nbts {
+public abstract class Nbts {
 	public static NbtCompound load(File f) {
 		try {
 			var compound = NbtIo.read(f);

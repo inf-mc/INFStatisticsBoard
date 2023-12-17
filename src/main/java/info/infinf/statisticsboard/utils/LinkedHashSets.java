@@ -2,7 +2,7 @@ package info.infinf.statisticsboard.utils;
 
 import java.util.LinkedHashSet;
 
-public final class LinkedHashSets {
+public abstract class LinkedHashSets {
 	public static boolean remove(LinkedHashSet set, int index) {
 		if (index > set.size()) {
 			return false;

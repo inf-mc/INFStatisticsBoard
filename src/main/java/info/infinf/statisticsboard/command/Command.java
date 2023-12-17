@@ -1,5 +1,7 @@
 package info.infinf.statisticsboard.command;
 
+import java.util.function.Supplier;
+
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -28,7 +30,7 @@ import info.infinf.statisticsboard.Config;
 import static net.minecraft.server.command.CommandManager.*;
 import static net.minecraft.command.argument.BlockPosArgumentType.getBlockPos;
 
-public final class Command {
+public abstract class Command {
 	private static final Logger LOGGER = LoggerFactory.getLogger("infboard");
 
 	public static void init(
@@ -54,13 +56,13 @@ public final class Command {
 							return 1;
 						}))))
 			.then(literal("miningAreaBlackList")
-				.then(addAreaHandler(Config.getMiningAreaBlackList()))
-				.then(removeAreaHandler(Config.getMiningAreaBlackList()))
-				.then(listAreaHandler(Config.getMiningAreaBlackList())))
+				.then(addAreaHandler(Config::getMiningAreaBlackList))
+				.then(removeAreaHandler(Config::getMiningAreaBlackList))
+				.then(listAreaHandler(Config::getMiningAreaBlackList)))
 			.then(literal("miningAreaWhiteList")
-				.then(addAreaHandler(Config.getMiningAreaWhiteList()))
-				.then(removeAreaHandler(Config.getMiningAreaWhiteList()))
-				.then(listAreaHandler(Config.getMiningAreaWhiteList())))
+				.then(addAreaHandler(Config::getMiningAreaWhiteList))
+				.then(removeAreaHandler(Config::getMiningAreaWhiteList))
+				.then(listAreaHandler(Config::getMiningAreaWhiteList)))
 			.then(literal("defaultMiningAreaTypeIsBlackList")
 				.executes(ctx -> {
 					ctx.getSource().sendFeedback(Text.of(
@@ -71,6 +73,26 @@ public final class Command {
 					.requires(src -> src.hasPermissionLevel(1))
 					.executes(ctx -> {
 						Config.setDefaultMiningAreaType(BoolArgumentType.getBool(ctx, "isBlackList"));
+						return 1;
+					})))
+			.then(literal("placementAreaBlackList")
+				.then(addAreaHandler(Config::getPlacementAreaBlackList))
+				.then(removeAreaHandler(Config::getPlacementAreaBlackList))
+				.then(listAreaHandler(Config::getPlacementAreaBlackList)))
+			.then(literal("placementAreaWhiteList")
+				.then(addAreaHandler(Config::getPlacementAreaWhiteList))
+				.then(removeAreaHandler(Config::getPlacementAreaWhiteList))
+				.then(listAreaHandler(Config::getPlacementAreaWhiteList)))
+			.then(literal("defaultPlacementAreaTypeIsBlackList")
+				.executes(ctx -> {
+					ctx.getSource().sendFeedback(Text.of(
+						Config.getDefaultPlacementAreaType() ? "BlackList" : "WhiteList"), false);
+					return 1;
+				})
+				.then(argument("isBlackList", BoolArgumentType.bool())
+					.requires(src -> src.hasPermissionLevel(1))
+					.executes(ctx -> {
+						Config.setDefaultPlacementAreaType(BoolArgumentType.getBool(ctx, "isBlackList"));
 						return 1;
 					})))
 			.then(literal("fakePlayerPrefix")
@@ -99,37 +121,38 @@ public final class Command {
 	}
 
 	private static LiteralArgumentBuilder<ServerCommandSource>
-			addAreaHandler(Areas area) {
+			addAreaHandler(Supplier<Areas> area) {
 		return literal("add")
 			.requires(src -> src.hasPermissionLevel(1))
 			.then(argument("dimension", DimensionArgumentType.dimension())
 				.then(argument("from", BlockPosArgumentType.blockPos())
 					.then(argument("to", BlockPosArgumentType.blockPos())
 						.executes(ctx -> {
-							if (area.add(
+							if (area.get().add(
 									BlockBox.create(getBlockPos(ctx, "from"), getBlockPos(ctx, "to")),
 									DimensionArgumentType.getDimensionArgument(
 										ctx, "dimension").getRegistryKey())) {
-								area.save();
+								area.get().save();
 							} else {
-								ctx.getSource().sendFeedback(Text.of("Area already exists"), false);
+								ctx.getSource().sendFeedback(Text.of(
+									"Area has already existed"), false);
 							}
 							return 1;
 						}))));
 	}
 
 	private static LiteralArgumentBuilder<ServerCommandSource>
-			removeAreaHandler(Areas area) {
+			removeAreaHandler(Supplier<Areas> area) {
 		return literal("remove")
 			.requires(src -> src.hasPermissionLevel(1))
 			.then(argument("dimension", DimensionArgumentType.dimension())
 				.then(argument("index", IntegerArgumentType.integer(1))
 						.executes(ctx -> {
-							if (area.remove(
+							if (area.get().remove(
 									IntegerArgumentType.getInteger(ctx, "index"),
 									DimensionArgumentType.getDimensionArgument(
 										ctx, "dimension").getRegistryKey())) {
-								area.save();
+								area.get().save();
 								return 1;
 							} else {
 								ctx.getSource().sendFeedback(Text.of("Index out of bound"), false);
@@ -139,10 +162,14 @@ public final class Command {
 	}
 
 	private static LiteralArgumentBuilder<ServerCommandSource>
-			listAreaHandler(Areas area) {
+			listAreaHandler(Supplier<Areas> area) {
 		return literal("list").executes(ctx -> {
-				ctx.getSource().sendFeedback(Text.of(area.toString()), false);
-				return 1;
+			try {
+				ctx.getSource().sendFeedback(Text.of(area.get().toString()), false);
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+			return 1;
 		});
 	}
 }

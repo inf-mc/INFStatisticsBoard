@@ -36,7 +36,7 @@ public class Areas {
 	public Areas(File savePath, NbtCompound compound) {
 		this.savePath = savePath;
 		areas = Maps.newHashMap();
-		for (var world: compound.getKeys()) {;
+		for (var world: compound.getKeys()) {
 			if (!Identifier.isValid(world)) {
 				continue;
 			}
@@ -76,8 +76,7 @@ public class Areas {
 		try {
 			NbtIo.write(result, savePath);
 		} catch (IOException e) {
-			LOGGER.error(String.format("An error occured when writing config file to %s",
-						savePath.getAbsolutePath()));
+			LOGGER.error("Error writing config file to {}", savePath);
 			e.printStackTrace();
 		}
 	}

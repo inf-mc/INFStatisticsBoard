@@ -42,19 +42,26 @@
 /infboard miningAreaBlackList add <纬度> <起始坐标> <结束坐标>
 ```
 需要权限等级: 1<br />
-添加黑名单区域
+添加挖掘榜黑名单区域
 
 ```
 /infboard miningAreaBlackList remove <序号: int>
 ```
 需要权限等级: 1<br />
-移除黑名单区域
+移除挖掘榜黑名单区域
 
-## miningAreaWhiteList
-挖掘榜白名单，操作同挖掘榜黑名单
+## miningAreaWhiteList/placementAreaBlackList/placementAreaWhiteList
+挖掘榜白名单/放置榜黑名单/放置榜白名单，操作同挖掘榜黑名单
 
 ## defaultMiningAreaTypeIsBlackList
 ```
 /infboard defaultMiningAreaTypeIsBlackList [开关: bool]
 ```
+需要权限等级: 1（设置）<br />
 若一个方块不在miningAreaBlackList和miningAreaWhiteList中，或同时在两个中，是否不计算该值，缺省为查看当前取值
+
+## defaultPlacementAreaTypeIsBlackList
+```
+/infboard defaultPlacementAreaTypeIsBlackList [开关: bool]
+```
+放置榜，其他同defaultMiningAreaTypeIsBlackList

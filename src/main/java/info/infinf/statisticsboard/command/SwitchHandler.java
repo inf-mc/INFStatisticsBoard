@@ -7,7 +7,7 @@ import net.minecraft.text.HoverEvent;
 import net.minecraft.text.Text;
 import net.minecraft.text.Texts;
 
-public class SwitchHandler {
+public abstract class SwitchHandler {
 	public static int sendScoreboards(CommandContext<ServerCommandSource> ctx) {
 		ctx.getSource().sendFeedback(Texts.join(
 			ctx.getSource().getServer().getScoreboard().getObjectives(),

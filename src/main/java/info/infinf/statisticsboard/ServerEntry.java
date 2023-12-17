@@ -15,6 +15,7 @@ import info.infinf.statisticsboard.command.Command;
 import info.infinf.statisticsboard.scoreboard.DeathBoard;
 import info.infinf.statisticsboard.scoreboard.KillBoard;
 import info.infinf.statisticsboard.scoreboard.MiningBoard;
+import info.infinf.statisticsboard.scoreboard.PlacementBoard;
 
 public final class ServerEntry implements ModInitializer {
 	private static final Logger LOGGER = LoggerFactory.getLogger("infboard");
@@ -28,8 +29,9 @@ public final class ServerEntry implements ModInitializer {
 	private void onServerStarted(MinecraftServer server) {
 		Config.init(server);
 		var scoreboard = server.getScoreboard();
-		// DeathBoard.init(scoreboard);
+		DeathBoard.init(scoreboard);
 		// KillBoard.init(scoreboard);
 		MiningBoard.init(scoreboard);
+		PlacementBoard.init(scoreboard);
 	}
 }

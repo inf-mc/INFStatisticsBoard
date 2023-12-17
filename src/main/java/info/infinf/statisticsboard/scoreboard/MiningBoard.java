@@ -13,7 +13,7 @@ import net.minecraft.world.World;
 
 import info.infinf.statisticsboard.Config;
 
-public final class MiningBoard {
+public abstract class MiningBoard {
 	private static ScoreboardObjective scoreboardObj;
 	public static final String NAME = "INFMiningBoard";
 	public static final String DISPLAY_NAME = "挖掘榜";
@@ -36,9 +36,7 @@ public final class MiningBoard {
 			BlockEntity be) {
 		// 防止发生错误，如果这里错误不捕获会导致挖掘不掉落方块
 		try {
-			var name = pl.getName().getString();
-			if (Config.getFpPrefixFeature() &&
-					name.startsWith(Config.getFpPrefix())) {
+			if (Config.shouldNotCount(pl)) {
 				return;
 			}
 			if (Config.getDefaultMiningAreaType()) {
@@ -52,9 +50,9 @@ public final class MiningBoard {
 					return;
 				}
 			}
-			var sc = scoreboardObj.getScoreboard().
-				getPlayerScore(name, scoreboardObj);
-			sc.setScore(sc.getScore() + 1);
+			var pc = pl.getScoreboard()
+				.getPlayerScore(pl.getEntityName(), scoreboardObj);
+			pc.setScore(pc.getScore() + 1);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
